@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strings"
+	"os/signal"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -34,6 +36,7 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/"))
 	// r.Mount("/debug", middleware.Profiler())
 
@@ -42,7 +45,6 @@ func main() {
 	})
 
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		route = strings.Replace(route, "/*/", "/", -1)
 		fmt.Printf("%s %s\n", method, route)
 		return nil
 	}
@@ -51,5 +53,27 @@ func main() {
 		fmt.Printf("Logging err: %s\n", err.Error())
 	}
 
-	http.ListenAndServe(":3000", r)
+	srv := &http.Server{
+		Addr:    "0.0.0.0:8080",
+		Handler: r,
+	}
+
+	// Clean up
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	<-c
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	srv.Shutdown(ctx)
+	log.Println("shutting down server")
+	os.Exit(0)
 }
