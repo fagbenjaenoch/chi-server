@@ -46,7 +46,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/"))
-	r.Mount("/debug", middleware.Profiler())
+	// r.Mount("/debug", middleware.Profiler())
 
 	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
 		msg := message{"Hello World"}
