@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -45,7 +46,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/"))
-	// r.Mount("/debug", middleware.Profiler())
+	r.Mount("/debug", middleware.Profiler())
 
 	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
 		msg := message{"Hello World"}
@@ -53,12 +54,15 @@ func main() {
 	})
 
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		if strings.HasPrefix(route, "/debug") {
+			return nil
+		}
 		fmt.Printf("%s %s\n", method, route)
 		return nil
 	}
 
 	if err := chi.Walk(r, walkFunc); err != nil {
-		fmt.Printf("Logging err: %s\n", err.Error())
+		fmt.Printf("Walk err: %s\n", err.Error())
 	}
 
 	srv := &http.Server{
