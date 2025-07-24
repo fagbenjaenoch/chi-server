@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,8 +19,14 @@ import (
 
 var db *sql.DB
 
+type message struct {
+	Message string `json:string`
+}
+
 func main() {
 	var err error
+	port := "8080"
+
 	err = godotenv.Load()
 	if err != nil {
 		log.Fatal("Could not load environment variables")
@@ -41,7 +48,8 @@ func main() {
 	// r.Mount("/debug", middleware.Profiler())
 
 	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World"))
+		msg := message{"Hello World"}
+		json.NewEncoder(w).Encode(msg)
 	})
 
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
@@ -54,12 +62,13 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    "0.0.0.0:8080",
+		Addr:    "0.0.0.0:" + port,
 		Handler: r,
 	}
 
-	// Clean up
+	// Graceful shutdown
 	go func() {
+		log.Println("server started on port " + port)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
