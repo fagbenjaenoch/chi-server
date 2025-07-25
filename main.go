@@ -33,6 +33,7 @@ func main() {
 	s, _ := strconv.ParseBool(skip)
 
 	if !s {
+		fmt.Println(s)
 		err = godotenv.Load()
 		if err != nil {
 			log.Fatal("Could not load environment variables", err)
