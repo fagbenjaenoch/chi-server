@@ -25,7 +25,7 @@ type message struct {
 
 func main() {
 	var err error
-	port := "8080"
+	port := os.Getenv("PORT")
 
 	// skip := os.Getenv("skip_env_load")
 	// s, _ := strconv.ParseBool(skip)
