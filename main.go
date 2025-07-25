@@ -30,7 +30,7 @@ func main() {
 
 	err = godotenv.Load()
 	if err != nil {
-		log.Fatal("Could not load environment variables")
+		log.Fatal("Could not load environment variables", err)
 	}
 	fmt.Println("Loaded environment variables successfully!")
 
