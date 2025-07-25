@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"time"
 
@@ -28,9 +29,14 @@ func main() {
 	var err error
 	port := "8080"
 
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatal("Could not load environment variables", err)
+	skip := os.Getenv("skip_env_load")
+	s, _ := strconv.ParseBool(skip)
+
+	if !s {
+		err = godotenv.Load()
+		if err != nil {
+			log.Fatal("Could not load environment variables", err)
+		}
 	}
 	fmt.Println("Loaded environment variables successfully!")
 
