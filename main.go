@@ -45,7 +45,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.Heartbeat("/"))
+	r.Use(middleware.Heartbeat("/healthz"))
 	// r.Mount("/debug", middleware.Profiler())
 
 	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
