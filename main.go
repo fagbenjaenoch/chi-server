@@ -9,13 +9,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -29,17 +27,17 @@ func main() {
 	var err error
 	port := "8080"
 
-	skip := os.Getenv("skip_env_load")
-	s, _ := strconv.ParseBool(skip)
+	// skip := os.Getenv("skip_env_load")
+	// s, _ := strconv.ParseBool(skip)
 
-	if !s {
-		fmt.Println(skip, s)
-		err = godotenv.Load()
-		if err != nil {
-			log.Fatal("Could not load environment variables", err)
-		}
-	}
-	fmt.Println("Loaded environment variables successfully!")
+	// if !s {
+	// 	fmt.Println(skip, s)
+	// 	err = godotenv.Load()
+	// 	if err != nil {
+	// 		log.Fatal("Could not load environment variables", err)
+	// 	}
+	// }
+	// fmt.Println("Loaded environment variables successfully!")
 
 	dbConnStr := os.Getenv("DB_CONN")
 	db, err = sql.Open("postgres", dbConnStr)
